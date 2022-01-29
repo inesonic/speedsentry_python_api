@@ -1,0 +1,81 @@
+#!/usr/bin/python3
+#-*-python-*-##################################################################
+# Copyright 2021-2022 Inesonic, LLC
+# All Rights Reserved
+###############################################################################
+
+"""
+Python command-line tool to test and demonstrate the /v1/capabilities/get
+endpoint and associated Python API functions.
+
+"""
+
+###############################################################################
+# Import:
+#
+
+import sys
+import argparse
+import json
+
+import speedsentry
+
+###############################################################################
+# Globals:
+#
+
+VERSION = "1a"
+"""
+The tool version number.
+
+"""
+
+DESCRIPTION = """
+Copyright 2021-2022 Inesonic, LLC
+
+You can use this small command line tool to demonstrate the
+/v1/capabilities/get REST API endpoint.
+
+"""
+
+###############################################################################
+# Main:
+#
+
+command_line_parser = argparse.ArgumentParser(description = DESCRIPTION)
+
+command_line_parser.add_argument(
+    "-v",
+    "--version",
+    action = 'version',
+    version = VERSION
+)
+
+command_line_parser.add_argument(
+    "-i",
+    "--id",
+    help = "You can use this switch to specify the customer identifier.",
+    type = str,
+    dest = 'customer_identifier'
+)
+
+command_line_parser.add_argument(
+    "-s",
+    "--secret",
+    help = "You can use this switch to specify the customer secret.  "
+           "The provided secret should be base-64 encoded.",
+    type = str,
+    dest = 'customer_secret'
+)
+
+arguments = command_line_parser.parse_args()
+customer_identifier = arguments.customer_identifier
+customer_secret = arguments.customer_secret
+
+api = speedsentry.SpeedSentry(
+    customer_identifier = customer_identifier,
+    customer_secret = customer_secret
+)
+
+capabilities = api.capabilities_get()
+print(json.dumps(capabilities, indent = 4))

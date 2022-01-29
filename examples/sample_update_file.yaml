@@ -1,0 +1,21 @@
+- uri : https://inesonic.com
+  
+- uri : /pricing
+  content_check_mode : content_match
+  
+- uri : /product
+  content_check_mode : all_keywords
+  keywords :
+    - Compiled
+    - Self Documenting
+    - Integration
+    - Speed
+  
+- uri : "/rest"
+  method : post
+  post_content_type : json
+  post_content : "
+    customer_id : 1
+    monitor_id : 5
+    url : https://inesonic.com/pricing"
+  post_user_agent : "Inesonic, LLC"

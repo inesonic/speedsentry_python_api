@@ -1,0 +1,306 @@
+#!/usr/bin/python3
+#-*-python-*-##################################################################
+# Copyright 2021-2022 Inesonic, LLC
+# All Rights Reserved
+###############################################################################
+
+"""
+Python command-line tool to test and demonstrate the /v1/latency/plot endpoint
+and associated Python API functions.
+
+"""
+
+###############################################################################
+# Import:
+#
+
+import sys
+import argparse
+import json
+
+import speedsentry
+
+###############################################################################
+# Globals:
+#
+
+VERSION = "1a"
+"""
+The tool version number.
+
+"""
+
+DESCRIPTION = """
+Copyright 2021-2022 Inesonic, LLC
+
+You can use this small command line tool to demonstrate the
+/v1/latency/plot REST API endpoint.
+
+"""
+
+###############################################################################
+# Main:
+#
+
+command_line_parser = argparse.ArgumentParser(description = DESCRIPTION)
+
+command_line_parser.add_argument(
+    "-v",
+    "--version",
+    action = 'version',
+    version = VERSION
+)
+
+command_line_parser.add_argument(
+    "-i",
+    "--id",
+    help = "You can use this switch to specify the customer identifier.",
+    type = str,
+    dest = 'customer_identifier'
+)
+
+command_line_parser.add_argument(
+    "-s",
+    "--secret",
+    help = "You can use this switch to specify the customer secret.  "
+           "The provided secret should be base-64 encoded.",
+    type = str,
+    dest = 'customer_secret'
+)
+
+command_line_parser.add_argument(
+    "-S",
+    "--start",
+    help = "You can use this switch to specify a starting Unix timestamp "
+           "value.",
+    type = int,
+    default = None,
+    dest = "start_timestamp"
+)
+
+command_line_parser.add_argument(
+    "-e",
+    "--end",
+    help = "You can use this switch to specify a ending Unix timestamp "
+           "value.",
+    type = int,
+    default = None,
+    dest = "end_timestamp"
+)
+
+command_line_parser.add_argument(
+    "-m",
+    "--monitor-id",
+    help = "You can use this switch to specify a specific monitor ID to "
+           "obtain latency data for.",
+    type = int,
+    default = None,
+    dest = "monitor_id"
+)
+
+command_line_parser.add_argument(
+    "-r",
+    "--region-id",
+    help = "You can use this switch to specify a specific region ID to "
+           "obtain latency data for.",
+    type = int,
+    default = None,
+    dest = "region_id"
+)
+
+command_line_parser.add_argument(
+    "-t",
+    "--title",
+    help = "You can use this switch to specify the desired plot title.",
+    type = str,
+    default = None,
+    dest = "title"
+)
+
+command_line_parser.add_argument(
+    "-x",
+    "--x-axis-label",
+    help = "You can use this switch to specify the desired X axis label.",
+    type = str,
+    default = None,
+    dest = "x_axis_label"
+)
+
+command_line_parser.add_argument(
+    "-y",
+    "--y-axis-label",
+    help = "You can use this switch to specify the desired Y axis label.",
+    type = str,
+    default = None,
+    dest = "y_axis_label"
+)
+
+command_line_parser.add_argument(
+    "-n",
+    "--minimum-latency",
+    help = "You can use this switch to specify the minimum plot latency to "
+           "show.",
+    type = float,
+    default = None,
+    dest = "minimum_latency"
+)
+
+command_line_parser.add_argument(
+    "-M",
+    "--maximum-latency",
+    help = "You can use this switch to specify the maximum plot latency to "
+           "show.",
+    type = float,
+    default = None,
+    dest = "maximum_latency"
+)
+
+command_line_parser.add_argument(
+    "-l",
+    "--log-scale",
+    help = "You can use this switch to specify that a log scale for latency "
+           "should be used.",
+    action = "store_true",
+    default = False,
+    dest = "log_scale"
+)
+
+command_line_parser.add_argument(
+    "-L",
+    "--linear-scale",
+    help = "You can use this switch to specify that a linear scale for "
+           "latency should be used.",
+    action = "store_false",
+    default = False,
+    dest = "log_scale"
+)
+
+command_line_parser.add_argument(
+    "-W",
+    "--width",
+    help = "You can use this switch to specify the desired plot width in "
+           "pixels.",
+    type = int,
+    default = None,
+    dest = "width"
+)
+
+command_line_parser.add_argument(
+    "-H",
+    "--height",
+    help = "You can use this switch to specify the desired plot height in "
+           "pixels.",
+    type = int,
+    default = None,
+    dest = "height"
+)
+
+command_line_parser.add_argument(
+    "-T",
+    "--plot-type",
+    help = "You can use this switch to specify the desired plot type.  "
+           "Supported values are \"history\" and \"histogram\".",
+    type = str,
+    default = None,
+    dest = "plot_type"
+)
+
+command_line_parser.add_argument(
+    "-f",
+    "--plot-format",
+    help = "You can use this switch to specify the desired plot format.  "
+           "Supported values are \"jpg\" and \"png\".",
+    type = str,
+    default = None,
+    dest = "plot_format"
+)
+
+command_line_parser.add_argument(
+    "-o",
+    "--output",
+    help = "You can use this switch to specify the name of the file to hold "
+           "the output.",
+    type = str,
+    default = None,
+    dest = "output_file"
+)
+
+arguments = command_line_parser.parse_args()
+customer_identifier = arguments.customer_identifier
+customer_secret = arguments.customer_secret
+start_timestamp = arguments.start_timestamp
+end_timestamp = arguments.end_timestamp
+monitor_id = arguments.monitor_id
+region_id = arguments.region_id
+title = arguments.title
+x_axis_label = arguments.x_axis_label
+y_axis_label = arguments.y_axis_label
+minimum_latency = arguments.minimum_latency
+maximum_latency = arguments.maximum_latency
+log_scale = arguments.log_scale
+width = arguments.width
+height = arguments.height
+plot_type = arguments.plot_type
+plot_format = arguments.plot_format
+output_file = arguments.output_file
+
+api = speedsentry.SpeedSentry(
+    customer_identifier = customer_identifier,
+    customer_secret = customer_secret
+)
+
+args = dict()
+if start_timestamp is not None:
+    args['start_timestamp'] = start_timestamp
+
+if end_timestamp is not None:
+    args['end_timestamp'] = end_timestamp
+
+if monitor_id is not None:
+    args['monitor_id'] = monitor_id
+
+if region_id is not None:
+    args['region_id'] = region_id
+
+if title is not None:
+    args['title'] = title
+
+if x_axis_label is not None:
+    args['x_axis_label'] = x_axis_label
+
+if y_axis_label is not None:
+    args['y_axis_label'] = y_axis_label
+
+if minimum_latency is not None:
+    args['minimum_latency'] = minimum_latency
+
+if maximum_latency is not None:
+    args['maximum_latency'] = maximum_latency
+
+if log_scale is not None:
+    args['log_scale'] = log_scale
+
+if width is not None:
+    args['width'] = width
+
+if height is not None:
+    args['height'] = height
+
+if plot_type is not None:
+    args['plot_type'] = plot_type
+
+if plot_format is not None:
+    args['plot_format'] = plot_format
+
+output_file = arguments.output_file
+
+plot_data = api.latency_plot(**args)
+
+if output_file is None:
+    if plot_format is not None:
+        output_file = 'plot.' + plot_format
+    else:
+        output_file = 'plot.png'
+
+with open(output_file, 'w+b') as fh:
+    fh.write(plot_data)
