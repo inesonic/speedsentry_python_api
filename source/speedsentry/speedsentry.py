@@ -39,7 +39,7 @@ from . import dictionary_object as dictionary_object
 # Globals:
 #
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 """
 The package version number.  This version number differs from Inesonic's
 standard scheme in order to comply with PEP 440.
@@ -311,7 +311,7 @@ class SpeedSentry(object):
 
     """
 
-    AUTHORITY = "https://rest.speedsentry.inesonic.com"
+    AUTHORITY = "https://rest.1.speed-sentry.com"
     """
     The authority for the customer REST API.
 

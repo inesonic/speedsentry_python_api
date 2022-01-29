@@ -1,7 +1,15 @@
 2022-01-29      Paul H. Smith   paul dot h dot smith at inesonic dot com
 
-        Initial public release under LGPLv3
+        Initial public release under LGPLv3.
 
-2022-01-29      Paul H. Smith   paul dot h dot smith at inesonic dot com
+1.0.0   2022-01-29      Paul H. Smith   paul dot h dot smith at inesonic dot com
 
-        Release 1.0.0
+        Tagged initial public release under LGPLv3.
+
+1.0.1   2022-01-29      Paul H. Smith   paul dot h dot smith at inesonic dot com
+
+        * Fixed a minor issue introduced during migration to github that
+          prevented the Python installer from running.
+
+        * The REST API endpoint was inadvertently changed back to the old, now
+          defunct, domain.
